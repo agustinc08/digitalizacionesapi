@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email    String  @unique
+  hash     String
+  hashedRt String?
+  role    Rol     @default(DIGITALIZADOR)
+  dependencia Dependencia? @relation(fields: [dependenciaId], references: [id])
+  dependenciaId Int?
+
+  @@map("users")
+}
+
+model Expediente {
+id Int @id @default(autoincrement())
+nroExpediente String
+fojas Fojas[]
+estados Estado[]
+creacion DateTime @default(now())
+fechaEntrega DateTime?
+agregados Boolean? @default(false)
+detallesSobreAgregados String?
+link String?
+observaciones String?
+turno DateTime?
+turnito DateTime
+}
+
+model Fojas{
+id Int @id @default(autoincrement())
+desde Int
+hasta Int
+expediente Expediente? @relation(fields: [expedienteId], references: [id])
+expedienteId Int?
+}
+
+model Dependencia{
+  id Int @id @default(autoincrement())
+  nombreDependencia String @unique
+  usuario User[]
+}
+
+enum Rol {
+  ADMIN
+  DIGITALIZADOR
+  ADMINDIGITALIZADOR
+}
+
+model Estado{
+  id Int @id @default(autoincrement())
+  tipoEstado String 
+  expediente Expediente? @relation(fields: [expedienteId], references: [id])
+  expedienteId Int?
+}
